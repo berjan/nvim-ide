@@ -18,7 +18,6 @@ lua << EOF
       "html",
       "javascript",
       "json",
-      "python",
       "yaml"
     },
   }
