@@ -14,7 +14,7 @@ ENV TZ=Europe/Warsaw
 EXPOSE 8080 8081 8082 8083 8084 8085
 
 # Define which Neovim COC extensions should be installed.
-ARG COC='coc-css coc-eslint coc-html coc-json coc-sh coc-sql coc-tsserver coc-yaml'
+ARG COC='coc-css coc-eslint coc-html coc-json coc-sh coc-sql coc-tsserver coc-yaml coc-pyright'
 
 # Lazygit variables
 ARG LG='lazygit'
@@ -39,7 +39,7 @@ ARG GIT_FLOW_DIR='gitflow-avh'
 # 11. npm for NodeJS.
 # 12. tzdata to set default container timezone.
 # 13. Everything needed to install Neovim from source.
-RUN apt-get update && apt-get -y install curl fzf ripgrep tree git xclip python3 python3-pip nodejs npm tzdata ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config zip unzip
+RUN apt-get update && apt-get -y install curl fzf ripgrep tree git xclip python3 python3-pip nodejs npm tzdata ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config zip unzip libpq-dev gcc
 
 # Cooperate Neovim with Python 3.
 #RUN pip3 install pynvim
@@ -103,9 +103,6 @@ WORKDIR /root/workspace
 # Docker file for Neovim Python3 development.
 #
 # @author Maciej Bedra
-
-# Neovim COC extensions for Python3 development.
-ARG COC='coc-pyright coc-python'
 
 # Create directory for virtual environments.
 RUN mkdir -p /root/envs
