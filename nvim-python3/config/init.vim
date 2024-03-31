@@ -2,18 +2,16 @@
 "
 " @author Maciej Bedra
 
-" Configuration for Neovim out of the box
-source /root/.config/nvim/general/settings.vim
-source /root/.config/nvim/general/keys.vim
 
 " Neovim extensions
-call plug#begin('/root/.config/nvim/plugins')
+call plug#begin('~/.config/nvim/plugins')
   Plug 'morhetz/gruvbox'
   Plug 'vim-airline/vim-airline'
   Plug 'vim-airline/vim-airline-themes'
   Plug 'preservim/nerdtree'
   Plug 'Xuyuanp/nerdtree-git-plugin'
   Plug 'ryanoasis/vim-devicons'
+  Plug 'gioele/vim-autoswap'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'mhinz/vim-startify'
   Plug 'nvim-lua/plenary.nvim'
@@ -43,3 +41,7 @@ source /root/.config/nvim/treesitter/treesitter.vim
 source /root/.config/nvim/coc/coc.vim
 source /root/.config/nvim/coc/extensions.vim
 source /root/.config/nvim/vimspector/vimspector.vim
+
+" Configuration for Neovim out of the box
+source /root/.config/nvim/general/settings.vim
+source /root/.config/nvim/general/keys.vim

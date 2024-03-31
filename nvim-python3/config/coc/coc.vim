@@ -55,38 +55,3 @@ vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(
 " Highlight symbol and references on cursor hold
 autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Key binding used to format code
-nmap <leader>cf <Plug>(coc-format)
-
-" Key binding for code action (optimize imports, generate code, etc.)
-nmap <leader>ca <Plug>(coc-codeaction)
-
-" Key binding used for symbol rename
-nmap <F2> <Plug>(coc-rename)
-
-" Key binding used to go to definition
-nmap <leader>cd <Plug>(coc-definition)
-
-" Key binding used to go to type definition
-nmap <leader>ct <Plug>(coc-type-definition)
-
-" Key binding used to to to implementation
-nmap <leader>ci <Plug>(coc-implementation)
-
-" Key binding used to go to declaration
-nmap <leader>cr <Plug>(coc-declaration)
-
-" Key binding used to find usages
-nmap <leader>cu <Plug>(coc-references)
-
-" Key binding for quick fix
-nmap <leader>cq <Plug>(coc-fix-current)
-
-" Key binding used to show code errors, warnings, etc.
-nmap <leader>ce :CocList diagnostics<CR>
-
-" Key binding for code outline
-nmap <M-7> :CocList outline<CR>
-
-" Key binding used to find symbol
-nmap <leader>cs :CocList -I symbols<CR>

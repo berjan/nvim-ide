@@ -39,7 +39,12 @@ ARG GIT_FLOW_DIR='gitflow-avh'
 # 11. npm for NodeJS.
 # 12. tzdata to set default container timezone.
 # 13. Everything needed to install Neovim from source.
-RUN apt-get update && apt-get -y install curl fzf ripgrep tree git xclip python3 python3-pip nodejs npm tzdata ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config zip unzip libpq-dev gcc
+RUN apt-get update && apt-get -y install zsh curl fzf ripgrep tree git xclip python3 python3-pip nodejs npm tzdata ninja-build gettext libtool libtool-bin autoconf automake cmake g++ pkg-config zip unzip libpq-dev gcc
+
+# install ohmyzshh	
+RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
+
+COPY zsh/_zshrc /root/.zshrc
 
 # Cooperate Neovim with Python 3.
 #RUN pip3 install pynvim
@@ -60,22 +65,29 @@ RUN mkdir -p /root/.local/share/nvim/site/spell
 COPY ./spell/ /root/.local/share/nvim/site/spell/
 
 # Install Vim Plug.
-RUN curl -fLo /root/.local/share/nvim/site/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+RUN curl -fLo /root/.local/share/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
 # Create directory for Neovim configuration files.
 RUN mkdir -p /root/.config/nvim
 
-# Copy Neovim configuration files.
+# Copy Neovim configuration files. Ensure this COPY includes all needed config files.
 COPY ./config/ /root/.config/nvim/
 
 # Install Neovim extensions.
 RUN nvim --headless +PlugInstall +qall
 
-# Create directory for Neovim COC extensions.
-RUN mkdir -p /root/.config/coc/extensions
+# Prepare for COC extensions installation by creating a package.json for coc extensions
+RUN mkdir -p /root/.config/coc/extensions && \
+    echo '{"dependencies":{}}' > /root/.config/coc/extensions/package.json
 
-# Install Neovim COC extensions.
-RUN cd /root/.config/coc/extensions && npm install $COC --global --only=prod
+# Install COC extensions using the package.json
+# Note: The `--global-style` flag ensures dependencies are installed in the node_modules directory under coc/extensions
+RUN cd /root/.config/coc/extensions && npm install $COC --global-style --only=prod
+
+# Additional setup for Neovim or other tools can go here
+# For example, if you need to install Python language debugger adapter as previously mentioned:
+RUN cd /root/.config/nvim/plugins/vimspector && python3 install_gadget.py --enable-python
 
 # Create TMP directory
 RUN mkdir -p /root/TMP
@@ -94,33 +106,24 @@ RUN rm -rf /root/TMP
 # Bash aliases
 COPY ./home/ /root/
 
-# Create directory for projects (there should be mounted from host).
-RUN mkdir -p /root/workspace
+# Create directories for projects and virtual environments.
+RUN mkdir -p /root/workspace /root/workspace/envs
 
-# Set default location after container startup.
-WORKDIR /root/workspace
+# Install dependencies and prepare the main virtual environment.
+# Copy only the necessary file first to leverage Docker cache.
+COPY ./env/requirements.txt /root/workspace/requirements.txt
 
-# Docker file for Neovim Python3 development.
-#
-# @author Maciej Bedra
+RUN apt-get update && apt-get install -y python3-venv \
+    && python3 -m venv /root/workspace/venv \
+    && /root/workspace/venv/bin/pip install --upgrade pip \
+    && /root/workspace/venv/bin/pip install -r /root/workspace/requirements.txt \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create directory for virtual environments.
-RUN mkdir -p /root/envs
+# Copy the rest of the environment folder (if necessary).
+COPY ./env/ /root/workspace/
 
-# Prepare main virtual environment (for language server features).
-COPY ./env/ /root/
-RUN apt-get update && apt-get -y install python3-venv
-RUN cd /root && python3 -m venv .env
-RUN /root/.env/bin/pip install -r /root/requirements.txt
-
-# Install Neovim COC extensions.
-RUN cd /root/.config/coc/extensions && npm install $COC --global --only=prod
-
-# Install Python language debugger adapter.
-RUN cd /root/.config/nvim/plugins/vimspector && python3 install_gadget.py --enable-python
-
-# Copy Neovim configuration files.
-COPY ./config/ /root/.config/nvim/
+WORKDIR /root/workspace/
 
 # Avoid container exit.
 CMD ["tail", "-f", "/dev/null"]

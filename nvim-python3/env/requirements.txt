@@ -19,3 +19,4 @@ toml
 typed-ast
 typing-extensions
 wrapt
+pynvim
